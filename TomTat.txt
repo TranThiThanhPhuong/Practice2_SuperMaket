@@ -1,0 +1,94 @@
+✅ Tóm tắt yêu cầu (ngắn)
+
+Quản lý 3 loại hàng: Food, Electronics, Crockery.
+
+Mỗi hàng có: productCode, name, quantity (>=0), unitPrice.
+
+Food có: manufactureDate, expiryDate (expiry > manufacture), supplier.
+
+Electronics có: warrantyMonths (>=0), capacityKW (>=0).
+
+Crockery có: manufacturer, arrivalDate.
+
+VAT: Food = 5%, Electronics = 10%, Crockery = 10%.
+
+Yêu cầu thêm: đánh giá consumption theo rules (Requirement 2).
+
+Use array để lưu danh sách hàng; có method addProduct không cho duplicate code; cho người dùng chọn type khi thêm.
+
+Phần A — Thiết kế lớp (Requirement 1)
+Các lớp đề xuất
+
+abstract class Product — lớp cha:
+
+attributes: String code, name; int quantity; double unitPrice
+
+methods: getters/setters, double getVATAmount(), String getType() , void displayInfo(), String evaluateConsumption() (abstract or default)
+
+class Food extends Product
+
+attributes: LocalDate manufactureDate, expiryDate; String supplier
+
+override getType(), displayInfo(), evaluateConsumption()
+
+class Electronics extends Product
+
+attributes: int warrantyMonths; double capacityKW
+
+override methods
+
+class Crockery extends Product
+
+attributes: String manufacturer; LocalDate arrivalDate
+
+override methods
+
+class InventoryManager
+
+attributes: Product[] products; int size; int capacity
+
+methods: boolean addProduct(Product p), void displayAll(), int totalQuantityByType(Class<?>), double totalVATByType(Class<?>), Product findByCode(String code)
+
+Phần B — Quy tắc đánh giá consumption (Requirement 2)
+
+Electronics: nếu quantity < 3 → "Sold" (considered sold / cần nhập thêm).
+
+Food: nếu quantity > 0 và expiryDate.isBefore(today) || expiryDate.isEqual(today) → "Expired - Hard to sell".
+
+Crockery: nếu quantity > 50 và daysInStorage > 10 → "Slow Sale".
+
+Các trường hợp còn lại: "No evaluation" (or "Normal").
+
+Phần C — Yêu cầu 3: Inventory manager (array) và thêm hàng
+
+InventoryManager dùng Product[] products = new Product[capacity] (ví dụ capacity 100).
+
+addProduct kiểm tra:
+
+không trùng productCode
+
+quantity >= 0, các ràng buộc riêng từng loại (expiry after manufacture, warranty>=0, capacityKW>=0)
+
+nếu hợp lệ → add vào mảng, trả về true; nếu lỗi → trả false (và in lỗi).
+
+Một số lưu ý & lời giải thích ngắn
+
+Mình dùng LocalDate (Java 8+) để quản lý ngày — dễ parse/format.
+
+addProduct kiểm tra duplicate productCode để tránh trùng.
+
+InventoryManager dùng mảng Product[] theo yêu cầu; nếu muốn thực tế hơn, ta có thể đổi sang ArrayList<Product>.
+
+evaluateConsumption() triển khai khác nhau cho từng subclass — tận dụng polymorphism.
+
+VAT amount tính theo unitPrice * quantity * VAT_RATE; bạn có thể điều chỉnh nếu muốn tính VAT trên tổng giá trị hay trên unit value.
+
+Muốn mở rộng (gợi ý)
+
+Lưu/đọc danh sách từ file CSV.
+
+Tìm, sửa, xóa sản phẩm theo mã.
+
+Sử dụng GUI (Swing/JavaFX) hoặc Web (Spring) cho giao diện quản lý.
+
+Thay array bằng ArrayList để tiện mở rộng.
